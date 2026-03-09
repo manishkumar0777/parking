@@ -212,7 +212,7 @@ const ParkingDashboard: React.FC<ParkingDashboardProps> = ({ onBookSlot, isAdmin
                   onClick={() => handleSlotClick(slot)}
                 >
                   <div className="flex justify-between items-start mb-4">
-                    <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${styles.badge}`}>
+                    <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold w-fit ${styles.badge}`}>
                       {styles.icon}
                       {styles.label}
                     </div>
@@ -223,14 +223,14 @@ const ParkingDashboard: React.FC<ParkingDashboardProps> = ({ onBookSlot, isAdmin
                           e.stopPropagation();
                           handleBookClick(slot.slotId);
                         }}
-                        className="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity bg-primary text-primary-foreground text-xs font-medium px-3 py-1.5 rounded-lg shadow-lg shadow-primary/20 hover:bg-primary/90"
+                        className="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity bg-primary text-primary-foreground text-xs font-medium px-3 py-1.5 rounded-lg shadow-lg shadow-primary/20 hover:bg-primary/90 whitespace-nowrap"
                       >
                         Book Now
                       </button>
                     )}
                     {/* Admin Action Badge */}
                     {isAdmin && slot.status !== 'vacant' && (
-                      <span className="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity text-xs font-medium text-muted-foreground bg-background/80 px-2 py-1 rounded-md">
+                      <span className="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity text-xs font-medium text-muted-foreground bg-background/80 px-2 py-1 rounded-md whitespace-nowrap">
                         View Details
                       </span>
                     )}

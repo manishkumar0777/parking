@@ -31,6 +31,12 @@ const ParkingDashboard: React.FC<ParkingDashboardProps> = ({ onBookSlot, isAdmin
 
   useEffect(() => {
     fetchSlots();
+
+    const interval = setInterval(() => {
+      fetchSlots(true);
+    }, 5000);
+
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -47,15 +53,16 @@ const ParkingDashboard: React.FC<ParkingDashboardProps> = ({ onBookSlot, isAdmin
     setFilteredSlots(result);
   }, [slots, searchTerm, filterStatus]);
 
-  const fetchSlots = async () => {
+  const fetchSlots = async (isBackground = false) => {
     try {
-      setLoading(true);
+      if (!isBackground) setLoading(true);
       const response = await fetch('/api/slots');
       const data = await response.json();
 
       if (response.ok) {
         setSlots(data.slots);
-        setFilteredSlots(data.slots);
+        // We don't setFilteredSlots here anymore because the useEffect above 
+        // will automatically run when 'slots' changes, preserving current filters.
       } else {
         setError(data.error || 'Failed to fetch slots');
       }
@@ -63,7 +70,7 @@ const ParkingDashboard: React.FC<ParkingDashboardProps> = ({ onBookSlot, isAdmin
       setError('Failed to load slots');
       console.error('Error fetching slots:', err);
     } finally {
-      setLoading(false);
+      if (!isBackground) setLoading(false);
     }
   };
 

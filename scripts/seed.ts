@@ -39,12 +39,7 @@ async function seedDatabase() {
         location: 'First Floor - Section B',
         deviceId: 'DEVICE_B001',
       },
-      {
-        slotId: 'B002',
-        status: 'vacant',
-        location: 'First Floor - Section B',
-        deviceId: 'DEVICE_B002',
-      },
+
     ];
 
     const createdSlots = await Slot.insertMany(slots);

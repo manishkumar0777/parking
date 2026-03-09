@@ -32,9 +32,9 @@ export default function BookingsPage() {
         // Filter by search
         if (searchTerm) {
             result = result.filter(b =>
-                b.userId.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                b.vehicleNo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                b.slotId.slotId.toLowerCase().includes(searchTerm.toLowerCase())
+                (b.userId?.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                (b.vehicleNo || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                (b.slotId?.slotId || '').toLowerCase().includes(searchTerm.toLowerCase())
             );
         }
 
@@ -180,10 +180,10 @@ export default function BookingsPage() {
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-2">
-                                                <div className="h-8 w-8 rounded-lg bg-accent flex items-center justify-center font-bold">
-                                                    {booking.slotId.slotId}
+                                                <div className="h-8 w-8 rounded-lg bg-accent flex items-center justify-center font-bold text-xs px-1 text-center">
+                                                    {booking.slotId?.slotId || 'Del'}
                                                 </div>
-                                                {booking.slotId.location && (
+                                                {booking.slotId?.location && (
                                                     <span className="text-xs text-muted-foreground hidden lg:inline-block">
                                                         {booking.slotId.location}
                                                     </span>

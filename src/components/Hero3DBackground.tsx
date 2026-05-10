@@ -88,7 +88,7 @@ export default function Hero3DBackground() {
         
         <Environment preset="city" />
         
-        <EffectComposer disableNormalPass>
+        <EffectComposer>
           <Bloom luminanceThreshold={1} mipmapBlur intensity={2} />
           <Vignette eskil={false} offset={0.1} darkness={1.1} />
         </EffectComposer>

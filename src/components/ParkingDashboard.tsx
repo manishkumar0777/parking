@@ -244,7 +244,7 @@ const ParkingLotScene = ({ slots, onSlotClick, isAdmin, filteredSlots }: any) =>
       <ContactShadows resolution={1024} scale={50} blur={2.5} opacity={0.7} far={10} color="#000000" />
 
       {/* Post Processing for Cinematic Feel */}
-      <EffectComposer disableNormalPass>
+      <EffectComposer>
         <Bloom luminanceThreshold={1} mipmapBlur intensity={1.5} />
         <Vignette eskil={false} offset={0.1} darkness={1.1} />
       </EffectComposer>

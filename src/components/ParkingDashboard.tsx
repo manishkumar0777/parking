@@ -120,7 +120,7 @@ const ParkingSlot3D = ({ position, slot, onClick, color, isVisible }: any) => {
     <group position={position}>
       {/* Floor Area */}
       <mesh
-        position={[0, 0.02, 0]}
+        position={[0, 0.05, 0]}
         rotation={[-Math.PI / 2, 0, 0]}
         onClick={(e) => { e.stopPropagation(); onClick(slot); }}
         onPointerOver={(e) => { e.stopPropagation(); setHovered(true); }}
@@ -136,13 +136,14 @@ const ParkingSlot3D = ({ position, slot, onClick, color, isVisible }: any) => {
       </mesh>
 
       {/* Neon Glowing Border */}
-      <mesh position={[0, 0.03, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      <mesh position={[0, 0.08, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <ringGeometry args={[1.35, 1.4, 4, 1, Math.PI / 4]} />
         <meshBasicMaterial
           color={slotColor}
           transparent
           opacity={0.8}
           side={THREE.DoubleSide}
+          depthWrite={false}
         />
       </mesh>
 
@@ -211,7 +212,7 @@ const ParkingLotScene = ({ slots, onSlotClick, isAdmin, filteredSlots }: any) =>
     <group>
       {/* High-tech Grid Floor */}
       <Grid
-        position={[0, -0.01, 0]}
+        position={[0, 0, 0]}
         args={[100, 100]}
         cellSize={1}
         cellThickness={0.5}
@@ -224,7 +225,7 @@ const ParkingLotScene = ({ slots, onSlotClick, isAdmin, filteredSlots }: any) =>
       />
 
       {/* Dark Asphalt base */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow position={[0, -0.02, 0]}>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow position={[0, -0.1, 0]}>
         <planeGeometry args={[100, 100]} />
         <meshStandardMaterial color="#020617" roughness={0.8} />
       </mesh>
@@ -244,7 +245,7 @@ const ParkingLotScene = ({ slots, onSlotClick, isAdmin, filteredSlots }: any) =>
       <ContactShadows resolution={1024} scale={50} blur={2.5} opacity={0.7} far={10} color="#000000" />
 
       {/* Post Processing for Cinematic Feel */}
-      <EffectComposer>
+      <EffectComposer disableNormalPass multisampling={4}>
         <Bloom luminanceThreshold={1} mipmapBlur intensity={1.5} />
         <Vignette eskil={false} offset={0.1} darkness={1.1} />
       </EffectComposer>
@@ -418,8 +419,7 @@ const ParkingDashboard: React.FC<ParkingDashboardProps> = ({ onBookSlot, isAdmin
             enablePan={true}
             enableZoom={true}
             enableRotate={true}
-            autoRotate={true}
-            autoRotateSpeed={0.5}
+            autoRotate={false}
             maxPolarAngle={Math.PI / 2 - 0.1}
             minDistance={5}
             maxDistance={50}

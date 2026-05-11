@@ -84,7 +84,7 @@ const CarModel = ({ color, ...props }: any) => {
 
 // Animated & Glowing Parking Slot Component
 const ParkingSlot3D = ({ position, slot, onClick, color, isVisible }: any) => {
-  const isOccupied = slot.status === 'occupied' || slot.status === 'booked';
+  const isOccupied = slot.status === 'occupied';
   const isVacant = slot.status === 'vacant';
   const [hovered, setHovered] = useState(false);
   useCursor(hovered);
@@ -241,13 +241,12 @@ const ParkingLotScene = ({ slots, onSlotClick, isAdmin, filteredSlots }: any) =>
         />
       ))}
 
-      {/* Contact Shadows for realism */}
-      <ContactShadows resolution={1024} scale={50} blur={2.5} opacity={0.7} far={10} color="#000000" />
+      {/* Contact Shadows for realism (Lowered resolution for mobile stability) */}
+      <ContactShadows resolution={256} scale={50} blur={2.5} opacity={0.7} far={10} color="#000000" />
 
-      {/* Post Processing for Cinematic Feel */}
-      <EffectComposer multisampling={4}>
+      {/* Post Processing for Cinematic Feel (Optimized for mobile) */}
+      <EffectComposer multisampling={0}>
         <Bloom luminanceThreshold={1} mipmapBlur intensity={1.5} />
-        <Vignette eskil={false} offset={0.1} darkness={1.1} />
       </EffectComposer>
     </group>
   );
@@ -397,7 +396,7 @@ const ParkingDashboard: React.FC<ParkingDashboardProps> = ({ onBookSlot, isAdmin
           <span className="text-xs font-medium text-muted-foreground">Drag to rotate • Scroll to zoom</span>
         </div>
 
-        <Canvas shadows camera={{ position: [0, 15, 20], fov: 45 }}>
+        <Canvas shadows camera={{ position: [0, 15, 20], fov: 45 }} dpr={[1, 1.5]} gl={{ antialias: false, powerPreference: "high-performance" }}>
           <color attach="background" args={['#0f172a']} />
           <ambientLight intensity={0.5} />
           <directionalLight

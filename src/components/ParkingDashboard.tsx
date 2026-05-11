@@ -183,7 +183,7 @@ const ParkingSlot3D = ({ position, slot, onClick, color, isVisible }: any) => {
 };
 
 // High-Tech Scene Setup
-const ParkingLotScene = ({ slots, onSlotClick, isAdmin, filteredSlots }: any) => {
+const ParkingLotScene = ({ slots, onSlotClick, isAdmin, filteredSlots, isMobile }: any) => {
   // Vibrant metallic colors
   const carColors = useMemo(() => {
     const colors = ['#3b82f6', '#ef4444', '#eab308', '#a855f7', '#ec4899', '#f97316', '#14b8a6', '#ffffff', '#silver'];
@@ -241,13 +241,15 @@ const ParkingLotScene = ({ slots, onSlotClick, isAdmin, filteredSlots }: any) =>
         />
       ))}
 
-      {/* Contact Shadows for realism (Lowered resolution for mobile stability) */}
-      <ContactShadows resolution={256} scale={50} blur={2.5} opacity={0.7} far={10} color="#000000" />
-
-      {/* Post Processing for Cinematic Feel (Optimized for mobile) */}
-      <EffectComposer multisampling={0}>
-        <Bloom luminanceThreshold={1} mipmapBlur intensity={1.5} />
-      </EffectComposer>
+      {/* Contact Shadows and Post Processing enabled ONLY on Desktop to prevent mobile flickering */}
+      {!isMobile && (
+        <>
+          <ContactShadows resolution={512} scale={50} blur={2.5} opacity={0.7} far={10} color="#000000" />
+          <EffectComposer multisampling={0}>
+            <Bloom luminanceThreshold={1} mipmapBlur intensity={1.5} />
+          </EffectComposer>
+        </>
+      )}
     </group>
   );
 };
@@ -262,6 +264,14 @@ const ParkingDashboard: React.FC<ParkingDashboardProps> = ({ onBookSlot, isAdmin
   const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<'all' | 'vacant' | 'occupied' | 'booked'>('all');
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     fetchSlots();
@@ -412,6 +422,7 @@ const ParkingDashboard: React.FC<ParkingDashboardProps> = ({ onBookSlot, isAdmin
             filteredSlots={filteredSlots}
             onSlotClick={handleSlotClick}
             isAdmin={isAdmin}
+            isMobile={isMobile}
           />
 
           <OrbitControls

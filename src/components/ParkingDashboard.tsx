@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import BookingModal from './BookingModal';
 import AdminSlotModal from './AdminSlotModal';
-import { Search, XCircle } from 'lucide-react';
+import { Search, XCircle, Box, LayoutGrid, Car, Clock, MapPin, CheckCircle, Info } from 'lucide-react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Text, ContactShadows, useCursor, Environment, Grid, Sparkles } from '@react-three/drei';
 import { useSpring, a } from '@react-spring/three';
@@ -265,9 +265,16 @@ const ParkingDashboard: React.FC<ParkingDashboardProps> = ({ onBookSlot, isAdmin
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<'all' | 'vacant' | 'occupied' | 'booked'>('all');
   const [isMobile, setIsMobile] = useState(false);
+  const [is3DMode, setIs3DMode] = useState(true);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    setMounted(true);
+    const checkMobile = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      if (mobile) setIs3DMode(false);
+    };
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
@@ -340,6 +347,14 @@ const ParkingDashboard: React.FC<ParkingDashboardProps> = ({ onBookSlot, isAdmin
     }
   };
 
+  if (!mounted) {
+    return (
+      <div className="flex justify-center items-center h-[calc(100vh-100px)] min-h-[600px] w-full">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto px-4 py-8 animate-fade-in flex flex-col h-[calc(100vh-100px)] min-h-[600px]">
       <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4 shrink-0">
@@ -353,7 +368,23 @@ const ParkingDashboard: React.FC<ParkingDashboardProps> = ({ onBookSlot, isAdmin
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-          <div className="relative">
+          {/* Proper Segmented Toggle Switch */}
+          <div className="flex items-center bg-card border border-border p-1 rounded-xl shadow-sm shrink-0">
+            <button
+              onClick={() => setIs3DMode(false)}
+              className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${!is3DMode ? 'bg-primary text-primary-foreground shadow-md' : 'text-muted-foreground hover:bg-muted'}`}
+            >
+              <LayoutGrid className="h-4 w-4" /> 2D View
+            </button>
+            <button
+              onClick={() => setIs3DMode(true)}
+              className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${is3DMode ? 'bg-primary text-primary-foreground shadow-md' : 'text-muted-foreground hover:bg-muted'}`}
+            >
+              <Box className="h-4 w-4" /> 3D View
+            </button>
+          </div>
+          
+          <div className="relative w-full sm:w-auto">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <input
               type="text"
@@ -402,39 +433,109 @@ const ParkingDashboard: React.FC<ParkingDashboardProps> = ({ onBookSlot, isAdmin
         </div>
 
         {/* Interactive instructions */}
-        <div className="absolute top-4 right-4 z-10 bg-background/80 backdrop-blur-md px-3 py-1.5 rounded-lg border border-border shadow-md pointer-events-none hidden md:block">
-          <span className="text-xs font-medium text-muted-foreground">Drag to rotate • Scroll to zoom</span>
-        </div>
+        {is3DMode && (
+          <div className="absolute top-4 right-4 z-10 bg-background/80 backdrop-blur-md px-3 py-1.5 rounded-lg border border-border shadow-md pointer-events-none hidden md:block">
+            <span className="text-xs font-medium text-muted-foreground">Drag to rotate • Scroll to zoom</span>
+          </div>
+        )}
 
-        <Canvas shadows camera={{ position: [0, 15, 20], fov: 45 }} dpr={[1, 1.5]} gl={{ antialias: false, powerPreference: "high-performance" }}>
-          <color attach="background" args={['#0f172a']} />
-          <ambientLight intensity={0.5} />
-          <directionalLight
-            position={[10, 20, 10]}
-            intensity={1.5}
-            castShadow
-            shadow-mapSize={[2048, 2048]}
-          />
-          <Environment preset="city" />
+        {is3DMode ? (
+          <Canvas shadows camera={{ position: [0, 15, 20], fov: 45 }} dpr={[1, 1.5]} gl={{ antialias: false, powerPreference: "high-performance" }}>
+            <color attach="background" args={['#0f172a']} />
+            <ambientLight intensity={0.5} />
+            <directionalLight
+              position={[10, 20, 10]}
+              intensity={1.5}
+              castShadow
+              shadow-mapSize={[2048, 2048]}
+            />
+            <Environment preset="city" />
 
-          <ParkingLotScene
-            slots={slots}
-            filteredSlots={filteredSlots}
-            onSlotClick={handleSlotClick}
-            isAdmin={isAdmin}
-            isMobile={isMobile}
-          />
+            <ParkingLotScene
+              slots={slots}
+              filteredSlots={filteredSlots}
+              onSlotClick={handleSlotClick}
+              isAdmin={isAdmin}
+              isMobile={isMobile}
+            />
 
-          <OrbitControls
-            enablePan={true}
-            enableZoom={true}
-            enableRotate={true}
-            autoRotate={false}
-            maxPolarAngle={Math.PI / 2 - 0.1}
-            minDistance={5}
-            maxDistance={50}
-          />
-        </Canvas>
+            <OrbitControls
+              enablePan={true}
+              enableZoom={true}
+              enableRotate={true}
+              autoRotate={false}
+              maxPolarAngle={Math.PI / 2 - 0.1}
+              minDistance={5}
+              maxDistance={50}
+            />
+          </Canvas>
+        ) : (
+          <div className="absolute inset-0 overflow-y-auto p-4 sm:p-6 custom-scrollbar bg-background">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
+              {filteredSlots.map((slot) => (
+                <div
+                  key={slot.id}
+                  className="bg-card border border-border rounded-2xl p-5 hover:border-primary/50 transition-all shadow-sm hover:shadow-md flex flex-col h-full group"
+                >
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h3 className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">{slot.slotId}</h3>
+                      {slot.location && (
+                        <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                          <MapPin className="h-3 w-3" /> {slot.location}
+                        </p>
+                      )}
+                    </div>
+                    <div className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider
+                      ${slot.status === 'vacant' ? 'bg-green-500/10 text-green-500 border border-green-500/20' : ''}
+                      ${slot.status === 'booked' ? 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20' : ''}
+                      ${slot.status === 'occupied' ? 'bg-red-500/10 text-red-500 border border-red-500/20' : ''}
+                    `}>
+                      {slot.status}
+                    </div>
+                  </div>
+
+                  <div className="flex-1 flex items-center justify-center py-6">
+                    <div className={`p-5 rounded-full transition-transform group-hover:scale-110 duration-300
+                      ${slot.status === 'vacant' ? 'bg-green-500/10' : slot.status === 'booked' ? 'bg-yellow-500/10' : 'bg-red-500/10'}
+                    `}>
+                      <Car className={`h-10 w-10 
+                        ${slot.status === 'vacant' ? 'text-green-500 opacity-40' : slot.status === 'booked' ? 'text-yellow-500' : 'text-red-500'}
+                      `} />
+                    </div>
+                  </div>
+
+                  <div className="mt-4 pt-4 border-t border-border flex flex-col gap-4">
+                    <div className="flex items-center text-xs text-muted-foreground gap-1.5 font-medium">
+                      <Clock className="h-3.5 w-3.5" />
+                      Updated: {new Date(slot.lastUpdated).toLocaleTimeString()}
+                    </div>
+                    <button
+                      onClick={() => handleSlotClick(slot)}
+                      className={`w-full py-2.5 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all shadow-sm
+                        ${slot.status === 'vacant' 
+                          ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
+                          : 'bg-muted text-foreground hover:bg-muted/80'}
+                      `}
+                    >
+                      {slot.status === 'vacant' ? (
+                        <>Book Slot <CheckCircle className="h-4 w-4" /></>
+                      ) : (
+                        <>View Details <Info className="h-4 w-4" /></>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              ))}
+              {filteredSlots.length === 0 && !loading && (
+                <div className="col-span-full flex flex-col justify-center items-center h-40 text-muted-foreground bg-muted/30 rounded-2xl border border-dashed border-border">
+                  <Search className="h-8 w-8 mb-2 opacity-50" />
+                  <p className="font-medium">No slots found matching your criteria.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       <BookingModal
